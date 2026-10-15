@@ -1,5 +1,5 @@
 /* CyberLab — all client-side except /api/check */
-const navMap = ['analyzer','generator','hash','crypto','encode','urlcheck','dns','ports','hashid','leakcheck','emailcheck'];
+const navMap = ['analyzer','generator','hash','crypto','encode','urlcheck','dns','ports','hashid','leakcheck','emailcheck','subfind'];
 
 /* ---------- tabs ---------- */
 function buildNav(){
@@ -7,7 +7,7 @@ function buildNav(){
   const labels = {
     analyzer:'Password Analyzer', generator:'Generator', hash:'Hash',
     crypto:'Crypto', encode:'Encode', urlcheck:'URL Check',
-    dns:'DNS Lookup', ports:'Port Info', hashid:'Hash ID', leakcheck:'Leak Check', emailcheck:'Email Breach'
+    dns:'DNS Lookup', ports:'Port Info', hashid:'Hash ID', leakcheck:'Leak Check', emailcheck:'Email Breach', subfind:'Subdomain'
   };
   navMap.forEach(k=>{
     const b = document.createElement('button');
@@ -345,6 +345,31 @@ function emailCheck(){
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ out.innerHTML='<span class="err">Format email tidak valid.</span>'; return; }
   window.open('https://haveibeenpwned.com/', '_blank');
   out.innerHTML = `<span class="ok">${esc(email)}</span><p style="margin-top:8px;color:var(--muted)">HIBP baru ke-tab &raquo; ketik email di kolom pencarian atas, isi captcha. Hasil = daftar aplikasi yang bocorkan email kamu (ukuran breach + tanggal).</p>`;
+}
+
+/* ---------- subdomain finder (passive via crt.sh / Worker) ---------- */
+async function subFinder(){
+  const out = document.getElementById('sub-out');
+  const domain = (document.getElementById('sub-in').value||'').trim();
+  if(!domain){ out.textContent='Isi domain dulu.'; return; }
+  out.innerHTML = 'Mengumpulkan dari Certificate Transparency…';
+  try{
+    const r = await fetch('/api/subdomains?domain='+encodeURIComponent(domain));
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error || r.status);
+    if(!d.count){ out.innerHTML = `<span class="err">Nggak ada subdomain ditemukan untuk ${esc(d.domain)}.</span>`; return; }
+    const chips = d.subdomains.map(s=>
+      `<a data-s="${esc(s)}" class="chip" href="#" onclick="event.preventDefault();runUrlCheck(this.dataset.s)">${esc(s)}</a>`
+    ).join('');
+    out.innerHTML = `<div class="kv"><span>${esc(d.domain)}</span><b>${d.count} subdomain</b></div>`+
+      `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">${chips}</div>`+
+      `<p style="margin-top:10px;color:var(--muted)">Sumber: sertifikat terpublikasi (CT). Bisa beda dari semua host beneran — beberapa mungkin wildcard/lamah terdokumentasi.</p>`;
+  }catch(e){ out.innerHTML = `<span class="err">Gagal: ${esc(e.message)}</span>`; }
+}
+function runUrlCheck(sub){
+  document.getElementById('url-in').value = 'https://'+sub;
+  switchTab('urlcheck');
+  urlCheck();
 }
 
 buildNav(); analyzePw();
