@@ -1,5 +1,5 @@
 /* CyberLab — all client-side except /api/check */
-const navMap = ['analyzer','generator','hash','crypto','encode','urlcheck','dns','ports','hashid'];
+const navMap = ['analyzer','generator','hash','crypto','encode','urlcheck','dns','ports','hashid','leakcheck'];
 
 /* ---------- tabs ---------- */
 function buildNav(){
@@ -7,7 +7,7 @@ function buildNav(){
   const labels = {
     analyzer:'Password Analyzer', generator:'Generator', hash:'Hash',
     crypto:'Crypto', encode:'Encode', urlcheck:'URL Check',
-    dns:'DNS Lookup', ports:'Port Info', hashid:'Hash ID'
+    dns:'DNS Lookup', ports:'Port Info', hashid:'Hash ID', leakcheck:'Leak Check'
   };
   navMap.forEach(k=>{
     const b = document.createElement('button');
@@ -304,6 +304,38 @@ function hashId(){
     return `<div class="kv"><span>#${i+1}</span><b style="font-size:12px"><span class="tag ${cls}">${esc(name)}</span> <code>${esc(h.slice(0,40))}${h.length>40?'…':''}</code></b></div>`;
   }).join('');
   out.innerHTML = html + `<p style="margin-top:10px;color:var(--muted)">Deteksi berbasis panjang+format saja. Konfirmasi dengan sampel & konteks. MD5/SHA-1 <b>tidak aman</b> untuk hash password.</p>`;
+}
+
+/* ---------- password leak check (HaveIBeenPwned k-anonymity) ---------- */
+async function shah1(s){
+  const buf = await crypto.subtle.digest('SHA-1', utf8(s));
+  return toHex(buf).toUpperCase();
+}
+async function leakCheck(){
+  const out = document.getElementById('leak-out');
+  const pw = document.getElementById('leak-in').value;
+  if(!pw){ out.textContent='Ketik password dulu.'; return; }
+  out.innerHTML = 'Mengecek…';
+  try{
+    const full = await shah1(pw);          // SHA-1 selalu di sini, bukan buat simpan password
+    const prefix = full.slice(0,5), suffix = full.slice(5);
+    const r = await fetch('https://api.pwnedpasswords.com/range/'+prefix, { headers:{'Add-Padding':'true'} });
+    if(!r.ok) throw new Error('HIBP ' + r.status);
+    const body = await r.text();
+    let count = 0;
+    for(const line of body.split(/\r?\n/)){
+      const [suf, cnt] = line.split(':');
+      if(suf.trim().toUpperCase() === suffix){ count = parseInt(cnt,10)||0; break; }
+    }
+    if(count > 0){
+      out.innerHTML = `<div class="kv"><span>Status</span><b><span class="tag bad">BOBOL</span></b></div>`+
+        `<div class="kv"><span>Ditemukan dalam breach</span><b>${count.toLocaleString('id-ID')} ×</b></div>`+
+        `<p style="margin-top:8px;color:var(--bad)">Password ini udah pernah bocor. Segera ganti, dan jangan dipakai lagi di akun lain (credential stuffing risk).</p>`;
+    }else{
+      out.innerHTML = `<div class="kv"><span>Status</span><b><span class="tag ok">AMAN</span></b></div>`+
+        `<p style="margin-top:8px;color:var(--muted)">Nggak ketemu di database breach HaveIBeenPwned. Tetap: kalau password lemah atau dipakai ulang, tetap ganti.</p>`;
+    }
+  }catch(e){ out.innerHTML = `<span class="err">Gagal: ${esc(e.message)} (butuh internet, HIBP rate-limit ketat).</span>`; }
 }
 
 buildNav(); analyzePw();

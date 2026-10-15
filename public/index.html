@@ -119,6 +119,16 @@
     <button onclick="hashId()">Identifikasi</button>
     <div class="out" id="hashid-out"></div>
   </section>
+
+  <section id="tab-leakcheck" class="tool">
+    <h2>Password Leak Check</h2>
+    <p>Cek apakah password udah pernah bocor — via HaveIBeenPwned (k-anonymity: cuma 5 char hash yang dikirim, aman).</p>
+    <div class="row">
+      <input id="leak-in" type="password" placeholder="Cek password di sini…" autocomplete="off">
+      <button onclick="leakCheck()">Cek</button>
+    </div>
+    <div class="out" id="leak-out"></div>
+  </section>
 </main>
 
 <script src="app.js"></script>
