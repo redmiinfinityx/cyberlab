@@ -16,6 +16,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm ci
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy public --project-name=cyberlab
+        run: npx -y wrangler@4 pages deploy public --project-name=cyberlab
