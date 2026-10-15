@@ -1,5 +1,5 @@
 /* CyberLab — all client-side except /api/check */
-const navMap = ['analyzer','generator','hash','crypto','encode','urlcheck','dns','ports','hashid','leakcheck'];
+const navMap = ['analyzer','generator','hash','crypto','encode','urlcheck','dns','ports','hashid','leakcheck','emailcheck'];
 
 /* ---------- tabs ---------- */
 function buildNav(){
@@ -7,7 +7,7 @@ function buildNav(){
   const labels = {
     analyzer:'Password Analyzer', generator:'Generator', hash:'Hash',
     crypto:'Crypto', encode:'Encode', urlcheck:'URL Check',
-    dns:'DNS Lookup', ports:'Port Info', hashid:'Hash ID', leakcheck:'Leak Check'
+    dns:'DNS Lookup', ports:'Port Info', hashid:'Hash ID', leakcheck:'Leak Check', emailcheck:'Email Breach'
   };
   navMap.forEach(k=>{
     const b = document.createElement('button');
@@ -336,6 +336,15 @@ async function leakCheck(){
         `<p style="margin-top:8px;color:var(--muted)">Nggak ketemu di database breach HaveIBeenPwned. Tetap: kalau password lemah atau dipakai ulang, tetap ganti.</p>`;
     }
   }catch(e){ out.innerHTML = `<span class="err">Gagal: ${esc(e.message)} (butuh internet, HIBP rate-limit ketat).</span>`; }
+}
+
+/* ---------- email breach check (link out ke HIBP, gratis) ---------- */
+function emailCheck(){
+  const out = document.getElementById('email-out');
+  const email = (document.getElementById('email-in').value||'').trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ out.innerHTML='<span class="err">Format email tidak valid.</span>'; return; }
+  window.open('https://haveibeenpwned.com/', '_blank');
+  out.innerHTML = `<span class="ok">${esc(email)}</span><p style="margin-top:8px;color:var(--muted)">HIBP baru ke-tab &raquo; ketik email di kolom pencarian atas, isi captcha. Hasil = daftar aplikasi yang bocorkan email kamu (ukuran breach + tanggal).</p>`;
 }
 
 buildNav(); analyzePw();
