@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberLab — Online Cyber Toolkit</title>
+<link rel="stylesheet" href="styles.css">
+<meta name="color-scheme" content="dark">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">⬢</span> Cyber<b>Lab</b></div>
+  <nav id="nav"></nav>
+</header>
+
+<main id="main" class="container">
+  <section id="tab-analyzer" class="tool active">
+    <h2>Password Analyzer</h2>
+    <p>Ukur kekuatan password + perkiraan waktu retas.</p>
+    <input id="pw" type="password" placeholder="Ketik password untuk dianalisis" autocomplete="off">
+    <div class="meter"><div id="meter-bar"></div></div>
+    <div class="pw-out" id="pw-out"></div>
+    <button class="ghost" onclick="toggleShow('pw')" type="button" id="pw-eye">Tampilkan</button>
+  </section>
+
+  <section id="tab-generator" class="tool">
+    <h2>Password Generator</h2>
+    <div class="row">
+      <label>Panjang <input id="glen" type="number" value="16" min="4" max="64"></label>
+      <label><input id="gupper" type="checkbox" checked> A-Z</label>
+      <label><input id="glower" type="checkbox" checked> a-z</label>
+      <label><input id="gdigit" type="checkbox" checked> 0-9</label>
+      <label><input id="gsym" type="checkbox" checked> !@#$%</label>
+    </div>
+    <button onclick="genPw()">Generate</button>
+    <div class="out" id="gen-out"></div>
+  </section>
+
+  <section id="tab-hash" class="tool">
+    <h2>Hash Tools</h2>
+    <p>Hitung hash / HMAC via WebCrypto (browser, data nggak keluar).</p>
+    <textarea id="hash-in" placeholder="Input text / data"></textarea>
+    <div class="row">
+      <label><input id="hsha256" type="radio" name="algo" checked> SHA-256</label>
+      <label><input id="hsha384" type="radio" name="algo"> SHA-384</label>
+      <label><input id="hsha512" type="radio" name="algo"> SHA-512</label>
+      <label><input id="hsha1" type="radio" name="algo"> SHA-1</label>
+      <label><input id="hhmac" type="radio" name="algo"> HMAC-SHA256</label>
+    </div>
+    <div id="hmac-key-wrap" style="display:none"><input id="hmac-key" type="text" placeholder="HMAC secret key"></div>
+    <button onclick="hashIt()">Hitung Hash</button>
+    <div class="out" id="hash-out"></div>
+  </section>
+
+  <section id="tab-crypto" class="tool">
+    <h2>Crypto Playground</h2>
+    <p>AES-256-GCM dengan kata sandi (PBKDF2). Data diproses lokal di browser.</p>
+    <textarea id="crypto-in" placeholder="Plaintext saat enkripsi / ciphertext+IV saat dekripsi"></textarea>
+    <input id="crypto-pass" type="password" placeholder="Kata sandi">
+    <div class="row">
+      <button onclick="crypt(true)">Enkripsi</button>
+      <button onclick="crypt(false)">Dekripsi</button>
+    </div>
+    <div class="out" id="crypto-out"></div>
+  </section>
+
+  <section id="tab-encode" class="tool">
+    <h2>Encode / Decode</h2>
+    <textarea id="enc-in" placeholder="Text / data"></textarea>
+    <div class="row">
+      <button onclick="enc('b64')">→ Base64</button>
+      <button onclick="dec('b64')">Base64 →</button>
+      <button onclick="enc('url')">→ URL-encode</button>
+      <button onclick="dec('url')">URL-decode →</button>
+      <button onclick="enc('hex')">→ Hex</button>
+      <button onclick="dec('hex')">Hex →</button>
+    </div>
+    <div class="out" id="enc-out"></div>
+  </section>
+
+  <section id="tab-urlcheck" class="tool">
+    <h2>URL Safety Check</h2>
+    <p>Periksa header keamanan, status, redirect & TLS sebuah website.</p>
+    <div class="row">
+      <input id="url-in" type="text" placeholder="https://contoh.com" value="https://">
+      <button onclick="urlCheck()">Check</button>
+    </div>
+    <div class="out" id="url-out"></div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
