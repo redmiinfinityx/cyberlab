@@ -87,6 +87,38 @@
     </div>
     <div class="out" id="url-out"></div>
   </section>
+
+  <section id="tab-dns" class="tool">
+    <h2>DNS Lookup</h2>
+    <p>Query DNS record pakai Cloudflare DNS-over-HTTPS (lewat Worker).</p>
+    <div class="row">
+      <input id="dns-in" type="text" placeholder="contoh.com" value="">
+      <select id="dns-type" style="background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:11px">
+        <option>A</option><option>AAAA</option><option>MX</option><option>TXT</option>
+        <option>NS</option><option>CNAME</option><option>ANY</option>
+      </select>
+      <button onclick="dnsLookup()">Lookup</button>
+    </div>
+    <div class="out" id="dns-out"></div>
+  </section>
+
+  <section id="tab-ports" class="tool">
+    <h2>Port Info</h2>
+    <p>Info layanan umum di balik nomor port (dictionary lokal).</p>
+    <div class="row">
+      <input id="port-in" type="number" placeholder="80" min="1" max="65535">
+      <button onclick="portInfo()">Info</button>
+    </div>
+    <div class="out" id="port-out"></div>
+  </section>
+
+  <section id="tab-hashid" class="tool">
+    <h2>Hash Identifier</h2>
+    <p>Tebak tipe hash dari panjang & format (deteksi local).</p>
+    <textarea id="hashid-in" placeholder="Tempel hash di sini…"></textarea>
+    <button onclick="hashId()">Identifikasi</button>
+    <div class="out" id="hashid-out"></div>
+  </section>
 </main>
 
 <script src="app.js"></script>
