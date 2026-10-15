@@ -1,7 +1,7 @@
 // /api/check — fetch target, reports status, redirect chain, TLS, security headers
 export async function onRequest(context) {
   const { request } = context;
-  const url = new URL(request.url).searchParams.get('url') || '';
+  let url = new URL(request.url).searchParams.get('url') || '';
   if (!/^https?:\/\//i.test(url)) {
     return json(400, { error: 'URL harus http/https' });
   }
